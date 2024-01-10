@@ -1,0 +1,109 @@
+
+
+const express = require('express')
+const app = express()
+const router = express.Router()
+const Bookmodel = require('../modals/bookmodel')
+
+
+router.post('/' , async (req , res) => {
+  try{
+    if(
+      !req.body.title||
+      !req.body.author||
+      !req.body.publishyear
+     ) {
+      return res.status(400).send({
+        massage: 'send all required filled title , author , publisheyear'
+      });
+     }
+     const newbook = {
+      title : req.body.title,
+      author: req.body.author,
+      publishyear : req.body.publishyear
+
+     }
+     const book = await Bookmodel.create(newbook);
+     return res.status(201).send(book);
+
+  } catch (error){
+    console.log(error.massage);
+    res.status(500).send({massage: error.massage});
+
+  }
+
+})
+// get all boks
+
+router.get('/' , async (req , res)=>{
+  try{
+    const books = await Bookmodel.find({})
+    return res.status(201).send({
+      count: books.length,
+      data: books
+    });
+
+
+  } catch (error){
+    console.log(error.massage);
+    res.status(500).send({massage: error.massage});
+
+  }
+})  
+// read book
+router.get('/:id' , async (req , res)=>{
+  try{
+    const {id} = req.params;
+    const book = await Bookmodel.findById(id)
+    return res.status(201).send(book)
+
+
+  } catch (error){
+    console.log(error.massage);
+    res.status(500).send({massage: error.massage});
+
+  }
+})  
+//update books 
+router.put('/:id', async (req , res) =>{
+  try{
+    if(
+      !req.body.title||
+      !req.body.author||
+      !req.body.publishyear
+     ) {
+      return res.status(400).send({
+        massage: 'send all required filled title , author , publisheyear'
+      });
+     }
+     const {id } =  req.params;
+     const result = await Bookmodel.findByIdAndUpdate(id ,request.body)
+     if(!result){
+      return res.status(400).send({massage: "book not found"})
+      }
+       return res.status(200).send({massage: "book updated succesfully"})
+
+  } catch(error){
+    console.log(error.massage);
+    res.status(500).send({massage: error.massage});
+
+  }
+})
+//delate book 
+router.delete('/:id' , async (req , res) =>{
+try{
+  const {id } = req.params;
+  const result = await Bookmodel.findByIdAndDelete(id)
+  if(!result){
+    return res.status(400).send({massage: "book not found"})
+  } 
+  return res.status(200).send({massage: "book delated succesfully"})
+
+  } catch(error){
+    console.log(error.massage);
+    res.status(500).send({massage: error.massage});
+
+  }
+})
+
+module.exports = router;
